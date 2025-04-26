@@ -96,7 +96,7 @@ export const resolvers = {
       const user = await User.findOne({ 
         $or: [
           { username },
-          { email: username } // Permitir login com email também
+          { email: username } 
         ]
       });
       
@@ -119,40 +119,47 @@ export const resolvers = {
         throw new Error("Request limit exceeded");
       }
       
-      if (amount <= 0) {
-        throw new Error("Invalid amount: must be greater than zero");
-      }
-      
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(key)) {
-        throw new Error("Invalid email format");
-      }
-      
-      if (user.balance < amount) {
-        return {
-          success: false,
-          message: "Insufficient funds",
-        };
-      }
-      
-      const receiverUser = await User.findOne({ email: key });
-      
-      if (!receiverUser) {
-        return {
-          success: false,
-          message: "Recipient not found: email is not registered",
-        };
-      }
-      
-      if (receiverUser._id.toString() === user._id.toString()) {
-        return {
-          success: false,
-          message: "Cannot transfer to yourself",
-        };
-      }
-      
       try {
-        user.token -= 1;
+        if (amount <= 0) {
+          throw new Error("Invalid amount: must be greater than zero");
+        }
+        
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(key)) {
+          throw new Error("Invalid email format");
+        }
+        
+        if (user.balance < amount) {
+          user.token -= 1;
+          await user.save();
+          
+          return {
+            success: false,
+            message: "Insufficient funds",
+          };
+        }
+        
+        const receiverUser = await User.findOne({ email: key });
+        
+        if (!receiverUser) {
+          user.token -= 1;
+          await user.save();
+          
+          return {
+            success: false,
+            message: "Recipient not found: email is not registered",
+          };
+        }
+        
+        if (receiverUser._id.toString() === user._id.toString()) {
+          user.token -= 1;
+          await user.save();
+          
+          return {
+            success: false,
+            message: "Cannot transfer to yourself",
+          };
+        }
         
         user.balance -= amount;
         receiverUser.balance += amount;
@@ -168,6 +175,9 @@ export const resolvers = {
           newBalance: user.balance
         };
       } catch (error: any) {
+        user.token = Math.max(0, user.token - 1);
+        await user.save();
+        
         return {
           success: false,
           message: `Transfer failed: ${error.message || "Unknown error"}`,
