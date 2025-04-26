@@ -1,10 +1,11 @@
-import { Context } from 'koa';
+import { Context as KoaContext } from 'koa';
 import jwt from 'jsonwebtoken';
 import { User } from '../auth/user';
+import { Context } from '../types/auth';
 
 const JWT_SECRET = "little_secret_do_sibelius";
 
-export const createContext = async ({ ctx }: { ctx: Context }) => {
+export const createContext = async ({ ctx }: { ctx: KoaContext }): Promise<Context> => {
   const authHeader = ctx.headers.authorization;
   
   if (!authHeader || !authHeader.startsWith("Bearer ")) {

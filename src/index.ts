@@ -7,7 +7,7 @@ import { createContext } from './graphql/context';
 import { connectDatabase } from './db';
 
 const app = new Koa();
-const port = 3000;
+const port = 3333;
 
 const startServer = async () => {
   await connectDatabase();
