@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:leaky-bucket": "jest tests/leakyBucket.test.ts --verbose",
     "dev": "nodemon src/index.ts"
   },
   "keywords": [],
@@ -12,6 +14,7 @@
   "license": "ISC",
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
+    "@types/jest": "^29.5.14",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/koa": "^2.15.0",
     "@types/koa-bodyparser": "^4.3.12",
@@ -20,6 +23,7 @@
     "koa": "^2.16.1",
     "koa-router": "^13.0.1",
     "nodemon": "^3.1.10",
+    "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   },
@@ -31,5 +35,12 @@
     "jsonwebtoken": "^9.0.2",
     "koa-bodyparser": "^4.4.1",
     "mongoose": "^8.14.0"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/tests/**/*.test.ts"
+    ]
   }
 }
