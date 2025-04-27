@@ -25,7 +25,7 @@ export const resolvers = {
       if (!user) throw new Error("Not authorized");
       
       if (user.token <= 0) {
-        throw new Error("Request limit exceeded");
+        throw new Error("Request limit exceeded, tokens: " + user.token);
       }
       
       user.token -= 1;
@@ -116,7 +116,7 @@ export const resolvers = {
       if (!user) throw new Error("Not authorized");
       
       if (user.token <= 0) {
-        throw new Error("Request limit exceeded");
+        throw new Error("Request limit exceeded, tokens: " + user.token);
       }
       
       try {

@@ -31,10 +31,6 @@ export const createContext = async ({ ctx }: { ctx: KoaContext }): Promise<Conte
       await user.save();
     }
     
-    if (user.token <= 0) {
-      throw new Error("Request limit exceeded");
-    }
-    
     return { user };
   } catch (error) {
     return { user: null };

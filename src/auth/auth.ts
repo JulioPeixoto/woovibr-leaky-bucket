@@ -6,7 +6,7 @@ import bcrypt from "bcrypt";
 const JWT_SECRET = "little_secret_do_sibelius"; 
 
 export const generateToken = (userId: string): string => {
-  return jwt.sign({ _id: userId }, JWT_SECRET, { expiresIn: "7d" });
+  return jwt.sign({ _id: userId }, JWT_SECRET, { expiresIn: "1h" });
 };
 
 export const authMiddleware = async (ctx: Context, next: Next) => {
