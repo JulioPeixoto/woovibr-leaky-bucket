@@ -23,8 +23,3 @@ export async function connectDatabase() {
       process.exit(1);
     }
 }
-
-export const closeDatabase = async () => {
-  await mongoose.connection.close();
-  console.log('MongoDB connection closed');
-};
