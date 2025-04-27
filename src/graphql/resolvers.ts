@@ -1,27 +1,31 @@
 import bcrypt from 'bcrypt';
 import { User } from '../auth/user';
 import { generateToken } from '../auth/auth';
-import { Context } from '../types/auth';
+import { Context, IUser } from '../types/auth';
 import { PixKeyResult, PixTransferResult } from '../types/pix';
+import { FindPixKeyArgs, RegisterArgs, LoginArgs, TransferPixArgs, Resolver, ProtectedResult, AuthPayload } from '../types/resolvers';
 
 export const resolvers = {
   Query: {
-    me: async (_: any, __: any, { user }: Context) => {
+    me: (async (_parent: unknown, _args: Record<string, never>, { user }: Context) => {
       if (!user) return null;
       return user;
-    },
-    product: async (_: any, __: any, { user }: Context) => {
+    }) as Resolver<IUser | null>,
+    
+    product: (async (_parent: unknown, _args: Record<string, never>, { user }: Context) => {
       if (!user) throw new Error("Not authorized");
       return "Hello World!";
-    },
-    protected: async (_: any, __: any, { user }: Context) => {
+    }) as Resolver<string>,
+    
+    protected: (async (_parent: unknown, _args: Record<string, never>, { user }: Context) => {
       if (!user) throw new Error("Not authorized");
       return { 
         message: "Access granted", 
         user: user.username 
       };
-    },
-    findPixKey: async (_: any, { key }: { key: string }, { user }: Context): Promise<PixKeyResult> => {
+    }) as Resolver<ProtectedResult>,
+    
+    findPixKey: (async (_parent: unknown, { key }: FindPixKeyArgs, { user }: Context) => {
       if (!user) throw new Error("Not authorized");
       
       if (user.token <= 0) {
@@ -53,10 +57,11 @@ export const resolvers = {
           userId: undefined
         };
       }
-    }
+    }) as Resolver<PixKeyResult, FindPixKeyArgs>
   },
+  
   Mutation: {
-    register: async (_: any, { username, password, email }: { username: string, password: string, email: string }) => {
+    register: (async (_parent: unknown, { username, password, email }: RegisterArgs) => {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
         throw new Error("Invalid email format");
@@ -91,8 +96,9 @@ export const resolvers = {
       const token = generateToken(user._id.toString());
       
       return { token, user };
-    },
-    login: async (_: any, { username, password }: { username: string, password: string }) => {
+    }) as Resolver<AuthPayload, RegisterArgs>,
+    
+    login: (async (_parent: unknown, { username, password }: LoginArgs) => {
       const user = await User.findOne({ 
         $or: [
           { username },
@@ -111,8 +117,9 @@ export const resolvers = {
       
       const token = generateToken(user._id.toString());
       return { token, user };
-    },
-    transferPix: async (_: any, { key, amount }: { key: string, amount: number }, { user }: Context): Promise<PixTransferResult> => {
+    }) as Resolver<AuthPayload, LoginArgs>,
+    
+    transferPix: (async (_parent: unknown, { key, amount }: TransferPixArgs, { user }: Context) => {
       if (!user) throw new Error("Not authorized");
       
       if (user.token <= 0) {
@@ -183,6 +190,6 @@ export const resolvers = {
           message: `Transfer failed: ${error.message || "Unknown error"}`,
         };
       }
-    }
+    }) as Resolver<PixTransferResult, TransferPixArgs>
   }
 };
