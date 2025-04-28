@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import { User } from "./user";
 import bcrypt from "bcrypt";
 
-const JWT_SECRET = "little_secret_do_sibelius"; 
+export const JWT_SECRET = "little_secret_do_sibelius"; 
 
 export const generateToken = (userId: string): string => {
   return jwt.sign({ _id: userId }, JWT_SECRET, { expiresIn: "1h" });

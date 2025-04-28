@@ -2,8 +2,7 @@ import { Context as KoaContext } from 'koa';
 import jwt from 'jsonwebtoken';
 import { User } from '../auth/user';
 import { Context } from '../types/auth';
-
-const JWT_SECRET = "little_secret_do_sibelius";
+import { JWT_SECRET } from '../auth/auth';
 
 export const createContext = async ({ ctx }: { ctx: KoaContext }): Promise<Context> => {
   const authHeader = ctx.headers.authorization;
